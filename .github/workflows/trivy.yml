@@ -24,19 +24,25 @@ jobs:
       - name: Build Docker image
         run: docker build -t vulnerablebank:local .
 
-      - name: Scan Docker image
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Scan Container and Generate SARIF
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: vulnerablebank:local
-          format: table
+          format: sarif
+          output: trivy-results.sarif
           exit-code: '0'
           severity: HIGH,CRITICAL
 
-      - name: Scan Dockerfile configuration
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-container
+
+      - name: Scan Dockerfile Configuration
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: config
           scan-ref: .
           format: table
           exit-code: '0'
-
