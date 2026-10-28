@@ -1,0 +1,42 @@
+
+name: Trivy Container Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  trivy:
+    name: Scan Container and Dockerfile
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t vulnerablebank:local .
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: vulnerablebank:local
+          format: table
+          exit-code: '0'
+          severity: HIGH,CRITICAL
+
+      - name: Scan Dockerfile configuration
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: config
+          scan-ref: .
+          format: table
+          exit-code: '0'
+
