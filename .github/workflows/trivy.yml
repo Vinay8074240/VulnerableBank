@@ -25,7 +25,7 @@ jobs:
         run: docker build -t vulnerablebank:local .
 
       - name: Scan Docker image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: vulnerablebank:local
           format: table
@@ -33,7 +33,7 @@ jobs:
           severity: HIGH,CRITICAL
 
       - name: Scan Dockerfile configuration
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: config
           scan-ref: .
