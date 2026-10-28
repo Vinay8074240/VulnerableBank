@@ -34,19 +34,20 @@ def home():
     """
 
 @app.route("/account")
+
 def account():
     username = request.args.get("username", "")
 
-    # INTENTIONALLY VULNERABLE:
-    # User input is concatenated into an SQL query.
     conn = sqlite3.connect("bank.db")
+
+    # FIX: Use a parameterized query to prevent SQL injection.
     query = (
         "SELECT username, balance FROM users "
-        f"WHERE username = '{username}'"
+        "WHERE username = ?"
     )
 
     try:
-        result = conn.execute(query).fetchone()
+        result = conn.execute(query, (username,)).fetchone()
     except sqlite3.Error:
         result = None
     finally:
@@ -56,6 +57,7 @@ def account():
         return f"<h2>Account: {result[0]}</h2><p>Balance: {result[1]}</p>"
 
     return "<h2>Account not found</h2>"
+
 
 if __name__ == "__main__":
     init_db()
